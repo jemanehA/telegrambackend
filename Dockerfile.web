@@ -3,12 +3,12 @@ FROM node:20-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+# Need devDependencies because ts-node-dev is in devDependencies
+RUN npm ci --include=dev
 
 COPY . .
 
-RUN npm run build
+# Your backend likely listens on 4001 (you mentioned before)
+EXPOSE 4001
 
-EXPOSE 3000
-
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
