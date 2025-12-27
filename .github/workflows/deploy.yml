@@ -1,0 +1,53 @@
+name: Build and Deploy to EC2
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build & push WEB image
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}:web
+          docker build -f Dockerfile.web -t $IMAGE .
+          docker push $IMAGE
+
+      - name: Build & push BOT image
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}:bot
+          docker build -f Dockerfile.bot -t $IMAGE .
+          docker push $IMAGE
+
+      - name: Deploy on EC2 (pull + restart)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            mkdir -p ~/apps/myproject
+            cd ~/apps/myproject
+
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
