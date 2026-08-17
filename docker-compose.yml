@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: telegrambackend-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PORT: "4001"
+      BASE_URL: "http://localhost:4001"
+
+      DB_HOST: "ptgr-mysql"
+      DB_PORT: "3306"
+      DB_USER: "telegram"
+      DB_PASS: "Tg_2025!A9x#Qp7mZr2"
+      DB_NAME: "ptgr_alpha"
+    networks:
+      - ptgr-net
+    ports:
+      - "4005:4001"
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: telegrambackend-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: "ptgr-mysql"
+      DB_PORT: "3306"
+      DB_USER: "telegram"
+      DB_PASS: "Tg_2025!A9x#Qp7mZr2"
+      DB_NAME: "ptgr_alpha"
+    networks:
+      - ptgr-net
+
+networks:
+  ptgr-net:
+    external: true
+    name: mainbackend_ptgr-net

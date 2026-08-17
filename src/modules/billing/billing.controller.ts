@@ -155,33 +155,52 @@ export async function stripeWebhook(req: Request, res: Response) {
             // Continue without invite link, user can request it later
           }
 
-          // Send success message with invite link
+          // Send success message with invite link button
           const message = inviteLink
-            ? `✅ Payment Successful!\n\n` +
-              `Your subscription is now active.\n` +
-              `Renews on: ${periodEndStr}\n\n` +
-              `🚪 Join the group now:\n` +
-              `${inviteLink}\n\n` +
-              `⚠️ This link can only be used once.`
-            : `✅ Payment Successful!\n\n` +
-              `Your subscription is now active.\n` +
-              `Renews on: ${periodEndStr}\n\n` +
-              `Use the "Join Group" button to get your invite link.`;
+            ? `🎉 *Payment Successful!*\n\n` +
+              `━━━━━━━━━━━━━━━━━━━━\n\n` +
+              `✅ Your subscription is now active!\n` +
+              `🔄 Renews on: ${periodEndStr}\n\n` +
+              `Click the button below to join the premium group!\n\n` +
+              `⚠️ *Important:* This link can only be used once.\n\n` +
+              `━━━━━━━━━━━━━━━━━━━━\n\n` +
+              `Welcome to the premium group! 🎊`
+            : `🎉 *Payment Successful!*\n\n` +
+              `━━━━━━━━━━━━━━━━━━━━\n\n` +
+              `✅ Your subscription is now active!\n` +
+              `🔄 Renews on: ${periodEndStr}\n\n` +
+              `Use the "Join Group" button to get your invite link.\n\n` +
+              `━━━━━━━━━━━━━━━━━━━━`;
+
+          const keyboard = inviteLink
+            ? {
+                inline_keyboard: [
+                  [{ text: "🚪 Join Premium Group", url: inviteLink }],
+                  [
+                    { text: "💎 Monthly Plan", callback_data: "subscribe_monthly" },
+                    { text: "⭐ Yearly Plan", callback_data: "subscribe_yearly" },
+                  ],
+                  [{ text: "📊 Check Status", callback_data: "check_status" }],
+                  [{ text: "🚪 Join Group", callback_data: "join_group" }],
+                ],
+              }
+            : {
+                inline_keyboard: [
+                  [
+                    { text: "💎 Monthly Plan", callback_data: "subscribe_monthly" },
+                    { text: "⭐ Yearly Plan", callback_data: "subscribe_yearly" },
+                  ],
+                  [{ text: "📊 Check Status", callback_data: "check_status" }],
+                  [{ text: "🚪 Join Group", callback_data: "join_group" }],
+                ],
+              };
 
           await bot.telegram.sendMessage(
             telegramUserId,
             message,
             {
-              reply_markup: {
-                inline_keyboard: [
-                  [
-                    { text: "📅 Subscribe Monthly", callback_data: "subscribe_monthly" },
-                    { text: "📅 Subscribe Yearly", callback_data: "subscribe_yearly" },
-                  ],
-                  [{ text: "✅ Check Status", callback_data: "check_status" }],
-                  [{ text: "🚪 Join Group", callback_data: "join_group" }],
-                ],
-              },
+              parse_mode: "Markdown",
+              reply_markup: keyboard,
             }
           );
         } catch (err: any) {

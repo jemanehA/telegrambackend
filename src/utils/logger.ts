@@ -1,10 +1,24 @@
+const getTimestamp = () => {
+  return new Date().toISOString();
+};
+
 export const logger = {
-  info: (...args: any[]) => console.log("[INFO]", ...args),
-  error: (...args: any[]) => console.error("[ERROR]", ...args),
-  warn: (...args: any[]) => console.warn("[WARN]", ...args),
+  info: (...args: any[]) => {
+    const timestamp = getTimestamp();
+    console.log(`[${timestamp}] [INFO]`, ...args);
+  },
+  error: (...args: any[]) => {
+    const timestamp = getTimestamp();
+    console.error(`[${timestamp}] [ERROR]`, ...args);
+  },
+  warn: (...args: any[]) => {
+    const timestamp = getTimestamp();
+    console.warn(`[${timestamp}] [WARN]`, ...args);
+  },
   debug: (...args: any[]) => {
     if (process.env.NODE_ENV !== "production") {
-      console.log("[DEBUG]", ...args);
+      const timestamp = getTimestamp();
+      console.log(`[${timestamp}] [DEBUG]`, ...args);
     }
   },
 };

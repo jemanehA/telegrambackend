@@ -26,4 +26,22 @@ export const env = {
   },
 
   earlyAccessDeadline: process.env.EARLY_ACCESS_DEADLINE!,
+
+  admin: {
+    apiKey: process.env.ADMIN_API_KEY || "admin-secret-key-change-in-production",
+  },
+
+  jwt: {
+    secret: process.env.JWT_SECRET || "change-this-secret-key-in-production",
+    refreshSecret: process.env.JWT_REFRESH_SECRET || "change-this-refresh-secret-key-in-production",
+    accessTokenExpiry: process.env.JWT_ACCESS_TOKEN_EXPIRY || "15m",
+    refreshTokenExpiry: process.env.JWT_REFRESH_TOKEN_EXPIRY || "7d",
+  },
+
+  cryptoPay: {
+    apiToken: process.env.CRYPTO_PAY_API_TOKEN || "",
+    testnetToken: process.env.CRYPTO_PAY_TESTNET_TOKEN || "",
+    network: process.env.CRYPTO_PAY_NETWORK || "mainnet",
+    webhookSecret: process.env.CRYPTO_PAY_WEBHOOK_SECRET,
+  },
 };
